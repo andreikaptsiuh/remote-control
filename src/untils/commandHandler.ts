@@ -1,18 +1,21 @@
 import WebSocket from 'ws';
 import { MouseController } from '../controllers/mouseController';
 import { DrawController } from '../controllers/drawController';
+import { PrintController } from '../controllers/printController';
 import { COMMANDS } from "../constants/commands";
 
 export class CommandHandler {
     private mouseController: MouseController;
     private drawController: DrawController;
+    private printController: PrintController;
 
     constructor(ws: WebSocket.WebSocket) {
         this.mouseController = new MouseController(ws);
         this.drawController = new DrawController(ws);
+        this.printController = new PrintController(ws);
     };
 
-    handleCommand = (command: string, ws: WebSocket.WebSocket) : void => {
+    handleCommand = async (command: string, ws: WebSocket.WebSocket) : Promise<void> => {
         const commandArg = this._getCommandArguments(command);
         const commandWithoutArg = command.split(' ')[0];
 
@@ -52,6 +55,10 @@ export class CommandHandler {
 
             case COMMANDS.draw_square:
                 this.drawController.drawSquare(<number>commandArg);
+                break;
+
+            case COMMANDS.prnt_scrn:
+                await this.printController.printScreen();
                 break;
         
             default:

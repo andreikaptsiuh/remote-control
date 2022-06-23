@@ -3,7 +3,7 @@ import WebSocket from 'ws';
 import { COMMANDS } from '../constants/commands';
 
 export class DrawController {
-    ws: WebSocket.WebSocket;
+    private ws: WebSocket.WebSocket;
 
     constructor(ws: WebSocket.WebSocket) {
         this.ws = ws;
