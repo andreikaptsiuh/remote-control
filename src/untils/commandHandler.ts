@@ -1,12 +1,15 @@
 import WebSocket from 'ws';
 import { MouseController } from '../controllers/mouseController';
+import { DrawController } from '../controllers/drawController';
 import { COMMANDS } from "../constants/commands";
 
 export class CommandHandler {
     private mouseController: MouseController;
+    private drawController: DrawController;
 
     constructor(ws: WebSocket.WebSocket) {
         this.mouseController = new MouseController(ws);
+        this.drawController = new DrawController(ws);
     };
 
     handleCommand = (command: string, ws: WebSocket.WebSocket) : void => {
@@ -33,6 +36,23 @@ export class CommandHandler {
             case COMMANDS.mouse_position:
                 this.mouseController.sendMousePosition();
                 break;
+
+            case COMMANDS.draw_circle:
+                this.drawController.drawCircle(<number>commandArg);
+                break;
+
+            case COMMANDS.draw_rectangle:
+                if (!Array.isArray(commandArg)) return;
+
+                const width: number = commandArg[0];
+                const height: number = commandArg[1];
+
+                this.drawController.drawRectangle(width, height);
+                break;
+
+            case COMMANDS.draw_square:
+                this.drawController.drawSquare(<number>commandArg);
+                break;
         
             default:
                 break;
@@ -47,8 +67,9 @@ export class CommandHandler {
         } else if (commandWithArgs.length === 2) {
             return +commandWithArgs[1];
         } else {
-            const commandArgs = commandWithArgs.splice(0, 1).map((item) => +item);
-            return commandArgs;
+            commandWithArgs.splice(0, 1);
+            const commandArgs = commandWithArgs.map((item) => Number(item));
+            return commandArgs as number[];
         };
     };
 };
