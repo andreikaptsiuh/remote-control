@@ -1,14 +1,7 @@
 import robot from 'robotjs';
-import WebSocket from 'ws';
 import { COMMANDS } from '../constants/commands';
 
 export class DrawController {
-    private ws: WebSocket.WebSocket;
-
-    constructor(ws: WebSocket.WebSocket) {
-        this.ws = ws;
-    };
-
     drawCircle = (radius: number) => {
         const mousePos = robot.getMousePos();
         robot.mouseToggle('down');
@@ -22,7 +15,7 @@ export class DrawController {
 
         robot.mouseToggle('up');
 
-        this.ws.send(`${COMMANDS.draw_circle} \0`);
+        return `${COMMANDS.draw_circle} \0`;
     };
 
     drawRectangle = (width: number, height: number) => {
@@ -37,7 +30,7 @@ export class DrawController {
         robot.moveMouseSmooth(firstMousePosition.x, firstMousePosition.y);
         robot.mouseToggle('up');
 
-        this.ws.send(`${COMMANDS.draw_rectangle} \0`);
+        return `${COMMANDS.draw_rectangle} \0`;
     };
 
     drawSquare = (size: number) => {
@@ -52,6 +45,6 @@ export class DrawController {
         robot.moveMouseSmooth(firstMousePosition.x, firstMousePosition.y);
         robot.mouseToggle('up');
 
-        this.ws.send(`${COMMANDS.draw_square} \0`);
+        return `${COMMANDS.draw_square} \0`;
     };
 };

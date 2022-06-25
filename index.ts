@@ -1,5 +1,5 @@
 import { httpServer } from './src/http_server/index';
-import { WebSocketServer } from 'ws';
+import { WebSocketServer, createWebSocketStream } from 'ws';
 import { CommandHandler } from './src/untils/commandHandler';
 
 const HTTP_PORT = 3000;
@@ -12,11 +12,17 @@ const wss = new WebSocketServer({ port: 8080 });
 wss.on('connection', (ws) => {
     console.log('Web socket connected on ws://localhost:8080!');
 
-    const commandHandler = new CommandHandler(ws);
+    const wsStream = createWebSocketStream(ws, { encoding: 'utf-8', decodeStrings: false });
+    const commandHandler = new CommandHandler();
 
-    ws.on('message', (data) => {
-        const command = data.toString();
-        commandHandler.handleCommand(command, ws);
+    wsStream.on('data', async (command) => {
+        const response = await commandHandler.handleCommand(command);
+        wsStream.write(response, 'utf-8');
+    });
+
+    wsStream.on('error', (err) => {
+        console.log(err);
+        wsStream.destroy();
     });
 
     ws.on('close', () => {

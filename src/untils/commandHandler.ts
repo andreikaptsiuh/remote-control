@@ -1,4 +1,5 @@
 import WebSocket from 'ws';
+import { Duplex } from 'stream';
 import { MouseController } from '../controllers/mouseController';
 import { DrawController } from '../controllers/drawController';
 import { PrintController } from '../controllers/printController';
@@ -9,40 +10,34 @@ export class CommandHandler {
     private drawController: DrawController;
     private printController: PrintController;
 
-    constructor(ws: WebSocket.WebSocket) {
-        this.mouseController = new MouseController(ws);
-        this.drawController = new DrawController(ws);
-        this.printController = new PrintController(ws);
+    constructor() {
+        this.mouseController = new MouseController();
+        this.drawController = new DrawController();
+        this.printController = new PrintController();
     };
 
-    handleCommand = async (command: string, ws: WebSocket.WebSocket) : Promise<void> => {
+    handleCommand = async (command: string) : Promise<void | string> => {
         const commandArg = this._getCommandArguments(command);
         const commandWithoutArg = command.split(' ')[0];
 
         switch (commandWithoutArg) {
             case COMMANDS.mouse_up:
-                this.mouseController.mouseUp(<number>commandArg);
-                break;
+                return this.mouseController.mouseUp(<number>commandArg);
     
             case COMMANDS.mouse_down:
-                this.mouseController.mouseDown(<number>commandArg);
-                break;
+                return this.mouseController.mouseDown(<number>commandArg);
     
             case COMMANDS.mouse_left:
-                this.mouseController.mouseLeft(<number>commandArg);
-                break;
+                return this.mouseController.mouseLeft(<number>commandArg);
     
             case COMMANDS.mouse_right:
-                this.mouseController.mouseRight(<number>commandArg);
-                break;
+                return this.mouseController.mouseRight(<number>commandArg);
     
             case COMMANDS.mouse_position:
-                this.mouseController.sendMousePosition();
-                break;
+                return this.mouseController.sendMousePosition();
 
             case COMMANDS.draw_circle:
-                this.drawController.drawCircle(<number>commandArg);
-                break;
+                return this.drawController.drawCircle(<number>commandArg);
 
             case COMMANDS.draw_rectangle:
                 if (!Array.isArray(commandArg)) return;
@@ -50,16 +45,13 @@ export class CommandHandler {
                 const width: number = commandArg[0];
                 const height: number = commandArg[1];
 
-                this.drawController.drawRectangle(width, height);
-                break;
+                return this.drawController.drawRectangle(width, height);
 
             case COMMANDS.draw_square:
-                this.drawController.drawSquare(<number>commandArg);
-                break;
+                return this.drawController.drawSquare(<number>commandArg);
 
             case COMMANDS.prnt_scrn:
-                await this.printController.printScreen();
-                break;
+                return await this.printController.printScreen();
         
             default:
                 break;
