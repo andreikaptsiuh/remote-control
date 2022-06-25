@@ -18,6 +18,8 @@
 
 * App served @ `http://localhost:3000` without nodemon
 
+Web socket started on `ws://localhost:8080`
+
 ---
 
 **All commands**
