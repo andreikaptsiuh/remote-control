@@ -16,8 +16,13 @@ wss.on('connection', (ws) => {
     const commandHandler = new CommandHandler();
 
     wsStream.on('data', async (command) => {
-        const response = await commandHandler.handleCommand(command);
-        wsStream.write(response, 'utf-8');
+        try {
+            const response = await commandHandler.handleCommand(command);
+            wsStream.write(response, 'utf-8');
+            console.log(`Command ${command} complete!`);
+        } catch {
+            console.log(`Command ${command} failed!`);
+        }
     });
 
     wsStream.on('error', (err) => {
